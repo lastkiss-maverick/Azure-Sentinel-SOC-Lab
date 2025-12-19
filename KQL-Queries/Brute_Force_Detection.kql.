@@ -1,0 +1,3 @@
+Syslog
+| where Facility == "auth" or Facility == "authpriv"
+| where SyslogMessage has "Failed password"
