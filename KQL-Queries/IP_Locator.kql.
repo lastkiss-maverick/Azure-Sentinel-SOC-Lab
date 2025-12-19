@@ -1,0 +1,14 @@
+Syslog
+| where Facility == "auth" or Facility == "authpriv"
+| where SyslogMessage has "Failed password"
+
+Syslog
+| where SyslogMessage has "Failed password"
+| extend AttackerIP = extract(@"from ([0-9.]+)", 1, SyslogMessage)
+| extend GeoData = geo_info_from_ip_address(AttackerIP)
+| extend Country = tostring(GeoData.country), 
+         City = tostring(GeoData.city), 
+         Latitude = tostring(GeoData.latitude), 
+         Longitude = tostring(GeoData.longitude)
+| summarize EventCount = count() by AttackerIP, Country, City, Latitude, Longitude
+| where isnotempty(Country)
